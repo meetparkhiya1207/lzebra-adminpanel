@@ -1,6 +1,7 @@
 import 'src/global.css';
 
 import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import Fab from '@mui/material/Fab';
 
@@ -41,7 +42,8 @@ export default function App({ children }: AppProps) {
   return (
     <ThemeProvider>
       {children}
-      {githubButton()}
+      <ToastContainer position="top-right" autoClose={3000} />
+      {/* {githubButton()} */}
     </ThemeProvider>
   );
 }

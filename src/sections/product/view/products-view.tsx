@@ -1,152 +1,282 @@
-import { useState, useCallback } from 'react';
+import { ToastContainer } from "react-toastify";
+import DataTable from "react-data-table-component";
+import { useState, useEffect, useCallback } from "react";
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Pagination from '@mui/material/Pagination';
-import Typography from '@mui/material/Typography';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { Button, Popover, MenuList, MenuItem, IconButton, menuItemClasses, CircularProgress } from "@mui/material";
 
-import { _products } from 'src/_mock';
-import { DashboardContent } from 'src/layouts/dashboard';
+import { DashboardContent } from "src/layouts/dashboard";
+import { getProducts, deleteProduct } from "src/api/productApi";
 
-import { ProductItem } from '../product-item';
-import { ProductSort } from '../product-sort';
-import { CartIcon } from '../product-cart-widget';
-import { ProductFilters } from '../product-filters';
+import { Label } from "src/components/label";
+import { Iconify } from "src/components/iconify";
 
-import type { FiltersProps } from '../product-filters';
-
-// ----------------------------------------------------------------------
-
-const GENDER_OPTIONS = [
-  { value: 'men', label: 'Men' },
-  { value: 'women', label: 'Women' },
-  { value: 'kids', label: 'Kids' },
-];
-
-const CATEGORY_OPTIONS = [
-  { value: 'all', label: 'All' },
-  { value: 'shose', label: 'Shose' },
-  { value: 'apparel', label: 'Apparel' },
-  { value: 'accessories', label: 'Accessories' },
-];
-
-const RATING_OPTIONS = ['up4Star', 'up3Star', 'up2Star', 'up1Star'];
-
-const PRICE_OPTIONS = [
-  { value: 'below', label: 'Below $25' },
-  { value: 'between', label: 'Between $25 - $75' },
-  { value: 'above', label: 'Above $75' },
-];
-
-const COLOR_OPTIONS = [
-  '#00AB55',
-  '#000000',
-  '#FFFFFF',
-  '#FFC0CB',
-  '#FF4842',
-  '#1890FF',
-  '#94D82D',
-  '#FFC107',
-];
-
-const defaultFilters = {
-  price: '',
-  gender: [GENDER_OPTIONS[0].value],
-  colors: [COLOR_OPTIONS[4]],
-  rating: RATING_OPTIONS[0],
-  category: CATEGORY_OPTIONS[0].value,
-};
+import ProductDetailsModel from "./product-details";
+import ProductInsertUpdateModel from "./productInsertUpdateModel";
 
 export function ProductsView() {
-  const [sortBy, setSortBy] = useState('featured');
+  const [userInsertUpdateModelOpen, setUserInsertUpdateModelOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [rowData, setRowData] = useState<any>(null);
+  const [detailsData, setDetailsData] = useState<any>(null);
+  const [productDetailOpen, setProductDetailOpen] = useState(false);
+  const [modalType, setModalType] = useState<any>('');
 
-  const [openFilter, setOpenFilter] = useState(false);
+  const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
-  const [filters, setFilters] = useState<FiltersProps>(defaultFilters);
-
-  const handleOpenFilter = useCallback(() => {
-    setOpenFilter(true);
+  const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    setOpenPopover(event.currentTarget);
   }, []);
 
-  const handleCloseFilter = useCallback(() => {
-    setOpenFilter(false);
+  const handleClosePopover = useCallback(() => {
+    setOpenPopover(null);
   }, []);
 
-  const handleSort = useCallback((newSort: string) => {
-    setSortBy(newSort);
-  }, []);
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("❌ Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [userInsertUpdateModelOpen]);
 
-  const handleSetFilters = useCallback((updateState: Partial<FiltersProps>) => {
-    setFilters((prevValue) => ({ ...prevValue, ...updateState }));
-  }, []);
+  const columns = [
+    {
+      name: "Image",
+      cell: (row: any) => (
+        row.images && row.images.length > 0 ? (
+          <img
+            src={`http://localhost:5000/uploads/${row?.images[0]?.filename}`}
+            alt={row.productName}
+            style={{
+              width: 80,
+              height: 80,
+              objectFit: "cover",
+              borderRadius: 6,
+              marginTop: 6,
+              marginBottom: 6,
+            }}
+          />
+        ) : (
+          <span>No Image</span>
+        )
+      ),
+      sortable: false,
+    },
+    {
+      name: "Name",
+      // selector: (row: any) => row.productName,
+      sortable: true,
+      cell: (row: any) => (
+        <Typography variant="caption" onClick={() => { setDetailsData(row); setProductDetailOpen(true) }
+        }>{row.productName}</Typography>
+      )
+    },
+    {
+      name: "Category",
+      selector: (row: any) => row.category,
+      sortable: true,
 
-  const canReset = Object.keys(filters).some(
-    (key) => filters[key as keyof FiltersProps] !== defaultFilters[key as keyof FiltersProps]
-  );
+    },
+    {
+      name: "Sub Category",
+      selector: (row: any) => row.subCategory,
+      sortable: true,
+    },
+    {
+      name: "Price",
+      selector: (row: any) => `₹${row.price}`,
+      sortable: true,
+    },
+    {
+      name: "Discount Price",
+      selector: (row: any) => `₹${row.discountPrice}`,
+      sortable: true,
+    },
+    {
+      name: "In Stock",
+      selector: (row: any) => row.inStock,
+      sortable: true,
+      cell: (row: any) => (
+        <Label color={(row.inStock === 'No' && 'error') || 'success'}>{row.inStock == "Yes" ? "In Stock" : "Out of Stock"}</Label>
+      ),
+    },
+    {
+      name: "Created",
+      selector: (row: any) => new Date(row.createdAt).toLocaleDateString(),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (row: any) => (
+        <IconButton
+          onClick={(e) => {
+            e.currentTarget.dataset.row = JSON.stringify(row);
+            handleOpenPopover(e);
+          }}
+        >
+          <Iconify icon="eva:more-vertical-fill" />
+        </IconButton>
+      ),
+    }
+
+  ];
+
+  const customStyles = {
+    table: {
+      style: {
+        backgroundColor: "#faf6f0c2",
+        fontFamily: "'Poppins', sans-serif",
+      },
+    },
+    headRow: {
+      style: {
+        backgroundColor: "#faf6f0c2",
+        color: "#5A3A1B",
+        fontWeight: "bold",
+        fontFamily: "'Poppins', sans-serif",
+      },
+    },
+    rows: {
+      style: {
+        backgroundColor: "#faf6f0c2",
+        color: "#5A3A1B",
+        fontFamily: "'Poppins', sans-serif",
+      },
+      stripedStyle: {
+        backgroundColor: "#faf6f0c2",
+        fontFamily: "'Poppins', sans-serif",
+      },
+    },
+    pagination: {
+      style: {
+        backgroundColor: "#faf6f0c2",
+        color: "#5A3A1B",
+        fontFamily: "'Poppins', sans-serif",
+      },
+    },
+  };
 
   return (
     <DashboardContent>
-      <CartIcon totalItems={8} />
-
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
-      </Typography>
+      <ToastContainer />
       <Box
         sx={{
           mb: 5,
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap-reverse',
-          justifyContent: 'flex-end',
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        <Box
-          sx={{
-            my: 1,
-            gap: 1,
-            flexShrink: 0,
-            display: 'flex',
-          }}
+        <Typography variant="h4" sx={{ flexGrow: 1, color: "#5A3A1B", fontFamily: "'Poppins', sans-serif", }}>
+          {userInsertUpdateModelOpen ? modalType === 'Edit' ? "Edit Product" : "Add Product" : "Products"}
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={
+            userInsertUpdateModelOpen ? "" : <Iconify icon="mingcute:add-line" />
+          }
+          onClick={() => {
+            setUserInsertUpdateModelOpen(!userInsertUpdateModelOpen)
+            setModalType('');
+            setRowData(null);
+          }
+          }
+          sx={{ bgcolor: "#5A3A1B", color: "#fff", fontFamily: "'Poppins', sans-serif" }}
         >
-          <ProductFilters
-            canReset={canReset}
-            filters={filters}
-            onSetFilters={handleSetFilters}
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
-            onResetFilter={() => setFilters(defaultFilters)}
-            options={{
-              genders: GENDER_OPTIONS,
-              categories: CATEGORY_OPTIONS,
-              ratings: RATING_OPTIONS,
-              price: PRICE_OPTIONS,
-              colors: COLOR_OPTIONS,
-            }}
-          />
-
-          <ProductSort
-            sortBy={sortBy}
-            onSort={handleSort}
-            options={[
-              { value: 'featured', label: 'Featured' },
-              { value: 'newest', label: 'Newest' },
-              { value: 'priceDesc', label: 'Price: High-Low' },
-              { value: 'priceAsc', label: 'Price: Low-High' },
-            ]}
-          />
-        </Box>
+          {userInsertUpdateModelOpen ? "Back to Products" : "New Product"}
+        </Button>
       </Box>
 
-      <Grid container spacing={3}>
-        {_products.map((product) => (
-          <Grid key={product.id} size={{ xs: 12, sm: 6, md: 3 }}>
-            <ProductItem product={product} />
-          </Grid>
-        ))}
-      </Grid>
+      {userInsertUpdateModelOpen ? (
+        <ProductInsertUpdateModel
+          setUserInsertUpdateModelOpen={setUserInsertUpdateModelOpen}
+          rowData={rowData}
+          modalType={modalType}
+        />
+      ) : loading ? (
+        <CircularProgress />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={products}
+          pagination
+          highlightOnHover
+          customStyles={customStyles}
 
-      <Pagination count={10} color="primary" sx={{ mt: 8, mx: 'auto' }} />
+          striped
+        />
+      )}
+      <Popover
+        open={!!openPopover}
+        anchorEl={openPopover}
+        onClose={handleClosePopover}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuList
+          disablePadding
+          sx={{
+            p: 0.5,
+            gap: 0.5,
+            width: 140,
+            display: 'flex',
+            fontFamily: "'Poppins', sans-serif",
+            flexDirection: 'column',
+            [`& .${menuItemClasses.root}`]: {
+              px: 1,
+              gap: 2,
+              borderRadius: 0.75,
+              [`&.${menuItemClasses.selected}`]: { bgcolor: 'action.selected' },
+            },
+          }}
+        >
+          <MenuItem
+            onClick={() => {
+              setModalType('Edit');
+              setRowData(openPopover?.dataset?.row ? JSON.parse(openPopover.dataset.row) : null);
+              setUserInsertUpdateModelOpen(true);
+              handleClosePopover();
+            }}
+            sx={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <Iconify icon="solar:pen-bold" />
+            Edit
+          </MenuItem>
+
+          <MenuItem onClick={async () => {
+            handleClosePopover();
+            const row = openPopover?.dataset?.row ? JSON.parse(openPopover.dataset.row) : null;
+            
+            try {
+              const res = await deleteProduct(row.product_id); // 👈 backend ma product_id pass karo
+              if (res.success) {
+                // UI update: remove deleted product from state
+                setProducts((prev) => prev.filter((p:any) => p?.product_id !== row.product_id));
+              }
+            } catch (error) {
+              console.error("Delete failed:", error);
+            }
+          }} sx={{ color: 'error.main', fontFamily: "'Poppins', sans-serif" }}>
+            <Iconify icon="solar:trash-bin-trash-bold" />
+            Delete
+          </MenuItem>
+        </MenuList>
+      </Popover>
+
+      {
+        productDetailOpen && (
+          <ProductDetailsModel productDetailOpen={productDetailOpen} setProductDetailOpen={setProductDetailOpen} detailsData={detailsData} />
+        )
+      }
     </DashboardContent>
   );
 }
