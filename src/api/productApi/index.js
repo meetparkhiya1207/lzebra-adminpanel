@@ -36,6 +36,10 @@ export const createProduct = async (productData, images) => {
 
 // // Get All Products
 export const getProducts = async () => {
+  console.log("API_URLAPI_URL",API_URL);
+  console.log("import.meta.env.VITE_BACKEND_URL",import.meta.env.VITE_BACKEND_URL);
+  console.log("import.meta.env",import.meta.env);
+  
   try {
     const res = await axios.get(API_URL);
     return res.data;
