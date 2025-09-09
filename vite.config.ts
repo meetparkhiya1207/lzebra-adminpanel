@@ -23,6 +23,9 @@ export default defineConfig({
       },
     }),
   ],
+   build: {
+    sourcemap: true,   // 👈 add this
+  },
   resolve: {
     alias: [
       {
