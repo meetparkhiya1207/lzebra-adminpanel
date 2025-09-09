@@ -111,7 +111,7 @@ const ProductDetailsModel: React.FC<Props> = ({
                             {/* Tab 2 - Product Images */}
                             {tab === 1 && (
                                 <Grid container spacing={2}>
-                                    {detailsData.images.map((img, i) => {
+                                    {(detailsData.images || []).map((img, i) => {
                                         const imgSrc =
                                             typeof img === "string"
                                                 ? `http://localhost:5000/uploads/${img}`

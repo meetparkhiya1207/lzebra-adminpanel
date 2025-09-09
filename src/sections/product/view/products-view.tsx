@@ -39,7 +39,7 @@ export function ProductsView() {
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
-        setProducts(data);
+        setProducts(data || []);
       } catch (error) {
         console.error("❌ Error fetching products:", error);
       } finally {
@@ -207,7 +207,7 @@ export function ProductsView() {
       ) : (
         <DataTable
           columns={columns}
-          data={products}
+          data={products || []}
           pagination
           highlightOnHover
           customStyles={customStyles}

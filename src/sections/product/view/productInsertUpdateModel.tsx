@@ -369,7 +369,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
                   multiple
                   renderValue={(selected) => (
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {selected.map((value: any) => (
+                      {(selected || []).map((value: any) => (
                         <Chip key={value} label={value} />
                       ))}
                     </Box>
