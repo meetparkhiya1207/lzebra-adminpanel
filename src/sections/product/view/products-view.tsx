@@ -55,7 +55,7 @@ export function ProductsView() {
       cell: (row: any) => (
         row.images && row.images.length > 0 ? (
           <img
-            src={`http://localhost:5000/uploads/${row?.images[0]?.filename}`}
+            src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${row?.images[0]?.filename}`}
             alt={row.productName}
             style={{
               width: 80,
