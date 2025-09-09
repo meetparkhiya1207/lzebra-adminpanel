@@ -21,6 +21,7 @@ interface ProductDetails {
     price: number;
     discountPrice: number;
     images: (string | ProductImage)[];
+    features: (string)[];
 }
 
 interface Props {
@@ -69,6 +70,7 @@ const ProductDetailsModel: React.FC<Props> = ({
                             <Tabs value={tab} onChange={(e, v) => setTab(v)}>
                                 <Tab label="Details" />
                                 <Tab label="Images" />
+                                <Tab label="Features" />
                             </Tabs>
                             <Divider sx={{ my: 2 }} />
                         </Box>
@@ -132,6 +134,19 @@ const ProductDetailsModel: React.FC<Props> = ({
                                     })}
                                 </Grid>
                             )}
+                            {tab === 2 && (
+                                <>
+                                    {detailsData?.features?.map((val: string, index: number) => (
+                                        <Box key={index}>
+                                            <Typography variant="body1" gutterBottom>
+                                                • {val}
+                                            </Typography>
+                                            <Divider sx={{ my: 2 }} />
+                                        </Box>
+                                    ))}
+                                </>
+                            )}
+
                         </Box>
                     </>
                 )}

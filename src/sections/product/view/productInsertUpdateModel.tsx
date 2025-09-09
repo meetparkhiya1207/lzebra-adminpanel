@@ -26,13 +26,18 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
     price: string
     discountPrice: string
     tags: string[]
-    description: string
+    description: string,
+    features: string[],
+    paintMeter: string,
+    shirtMeter: string,
   }
 
   const [images, setImages] = useState<File[]>([])
   const [preview, setPreview] = useState<string[]>([])
   const [backendImages, setBackendImages] = useState<any[]>([]);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState("")
+
   const {
     control,
     handleSubmit,
@@ -49,6 +54,9 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       discountPrice: modalType === 'Edit' && rowData ? rowData?.discountPrice : "",
       tags: modalType === 'Edit' && rowData ? rowData?.tags || [] : [],
       description: modalType === 'Edit' && rowData ? rowData?.description : "",
+      features: modalType === 'Edit' && rowData ? rowData?.features || [] : [],
+      paintMeter: modalType === 'Edit' && rowData ? rowData?.paintMeter : "",
+      shirtMeter: modalType === 'Edit' && rowData ? rowData?.shirtMeter : "",
     }
   })
   console.log("rowDatarowData", rowData);
@@ -162,7 +170,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
           <Controller
             name="productName"
             control={control}
-            rules={{ required: "Product Name is required" }}
+            // rules={{ required: "Product Name is required" }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -180,7 +188,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
             <Controller
               name="category"
               control={control}
-              rules={{ required: "Category is required" }}
+              // rules={{ required: "Category is required" }}
               render={({ field }) => (
                 <Select {...field} label="Category">
                   {Object.keys(categories).map((cat) => (
@@ -207,7 +215,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
             <Controller
               name="subCategory"
               control={control}
-              rules={{ required: "Sub Category is required" }}
+              // rules={{ required: "Sub Category is required" }}
               render={({ field }) => (
                 <Select {...field} label="Sub Category">
                   {selectedCategory &&
@@ -248,7 +256,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
           <Controller
             name="price"
             control={control}
-            rules={{ required: "Price is required" }}
+            // rules={{ required: "Price is required" }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -270,7 +278,84 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
           />
         </Grid>
       </Grid>
+      <Grid container spacing={4} sx={{ marginTop: 4 }}>
+        <Grid size={6}>
+          <Controller
+            name="paintMeter"
+            control={control}
+            render={({ field }) => (
+              <TextField {...field} label="Paint Meter" fullWidth />
+            )}
+          />
+        </Grid>
 
+        <Grid size={6}>
+          <Controller
+            name="shirtMeter"
+            control={control}
+            render={({ field }) => (
+              <TextField {...field} label="Shirt Meter" fullWidth />
+            )}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid size={6} sx={{ marginTop: 4 }}>
+        {/* <Typography variant="subtitle1" gutterBottom>
+          Features
+        </Typography> */}
+
+        <Controller
+          name="features"
+          control={control}
+          render={({ field }) => {
+
+            const handleAdd = () => {
+              if (inputValue.trim() !== "") {
+                field.onChange([...(field.value || []), inputValue.trim()])
+                setInputValue("")
+              }
+            }
+
+            const handleRemove = (index: number) => {
+              const updated = field.value.filter((_: any, i: number) => i !== index)
+              field.onChange(updated)
+            }
+
+            return (
+              <Box>
+                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                  <TextField
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    label="Features"
+                    fullWidth
+                  />
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: "#5A3A1B", color: "#fff" }}
+                    onClick={handleAdd}
+                  >
+                    Add
+                  </Button>
+                </Box>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {field.value?.map((feature: string, index: number) => (
+                    <Chip
+                      key={index}
+                      label={feature}
+                      onDelete={() => handleRemove(index)}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )
+          }}
+        />
+      </Grid>
       <Grid container spacing={4} sx={{ marginTop: 4 }}>
         <Grid size={6}>
           <FormControl fullWidth>
@@ -339,6 +424,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
         ))}
       </Grid>
 
+
       <Grid size={12} sx={{ marginTop: 4 }}>
         <Typography variant="subtitle1" gutterBottom>
           Description
@@ -346,7 +432,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
         <Controller
           name="description"
           control={control}
-          rules={{ required: "Description is required" }}
+          // rules={{ required: "Description is required" }}
           render={({ field }) => (
             <TextField
               {...field}

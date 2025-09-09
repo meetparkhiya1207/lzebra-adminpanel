@@ -14,12 +14,15 @@ export const createProduct = async (productData, images) => {
   formData.append("price", productData.price);
   formData.append("discountPrice", productData.discountPrice);
   formData.append("description", productData.description);
+  formData.append("shirtMeter", productData.shirtMeter);
+  formData.append("paintMeter", productData.paintMeter);
 
   // tags (multiple)
   formData.append("tags", JSON.stringify(productData.tags));
-  
+  formData.append("features", JSON.stringify(productData.features));
+
   images.forEach((file) => {
-      console.log("imagesimages",file);
+    console.log("imagesimages", file);
     formData.append("images", file);
   });
 
@@ -46,7 +49,7 @@ export const getProducts = async () => {
 export const updateProduct = async (productData, images, deletedImages) => {
   const formData = new FormData();
 
-  formData.append("productId", productData.id); // 👈 id મોકલો
+  formData.append("productId", productData.id);
   formData.append("productName", productData.productName);
   formData.append("category", productData.category);
   formData.append("subCategory", productData.subCategory);
@@ -54,9 +57,12 @@ export const updateProduct = async (productData, images, deletedImages) => {
   formData.append("price", productData.price);
   formData.append("discountPrice", productData.discountPrice);
   formData.append("description", productData.description);
-formData.append("deletedImages", JSON.stringify(deletedImages));
+  formData.append("deletedImages", JSON.stringify(deletedImages));
+  formData.append("shirtMeter", productData.shirtMeter);
+  formData.append("paintMeter", productData.paintMeter);
 
   formData.append("tags", JSON.stringify(productData.tags));
+  formData.append("features", JSON.stringify(productData.features));
 
   if (images && images.length > 0) {
     images.forEach((file) => {
