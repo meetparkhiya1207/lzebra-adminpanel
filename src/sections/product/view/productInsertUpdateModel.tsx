@@ -92,8 +92,10 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
   useEffect(() => {
     if (modalType === "Edit" && rowData?.images?.length > 0) {
       setBackendImages(rowData.images) // DB ની images track કરવી
+      console.log("rowDatarowData",rowData);
+      
       const backendPreview = rowData.images.map(
-        (img: any) => `${import.meta.env.VITE_BACKEND_URL}/uploads/${img?.filename}`
+        (img: any) => img?.url
       )
       setPreview(backendPreview)
     }
@@ -106,7 +108,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       setBackendImages((prevBackend) => {
         const updatedBackend = prevBackend.filter((_, i) => i !== index)
         const updatedPreview = [
-          ...updatedBackend.map((img: any) => `${import.meta.env.VITE_BACKEND_URL}/uploads/${img.filename}`),
+          ...updatedBackend.map((img: any) => img?.url),
           ...images.map((file) => URL.createObjectURL(file))
         ]
         setPreview(updatedPreview)
@@ -117,7 +119,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       setImages((prevImages) => {
         const updatedImages = prevImages.filter((_, i) => i !== newIndex)
         const updatedPreview = [
-          ...backendImages.map((img: any) => `${import.meta.env.VITE_BACKEND_URL}/uploads/${img.filename}`),
+          ...backendImages.map((img: any) =>img?.url),
           ...updatedImages.map((file) => URL.createObjectURL(file))
         ]
         setPreview(updatedPreview)
