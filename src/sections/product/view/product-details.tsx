@@ -10,31 +10,12 @@ import {
     Typography,
 } from "@mui/material";
 
-interface ProductImage {
-    filename: string;
-}
 
-interface ProductDetails {
-    productName: string;
-    category: string;
-    subCategory: string;
-    price: number;
-    discountPrice: number;
-    images: (string | ProductImage)[];
-    features: (string)[];
-}
-
-interface Props {
-    productDetailOpen: boolean;
-    setProductDetailOpen: (open: boolean) => void;
-    detailsData: ProductDetails | null;
-}
-
-const ProductDetailsModel: React.FC<Props> = ({
+const ProductDetailsModel = ({
     productDetailOpen,
     setProductDetailOpen,
     detailsData,
-}) => {
+}: any) => {
     const [tab, setTab] = useState(0);
 
     const handleClose = () => {
@@ -111,11 +92,8 @@ const ProductDetailsModel: React.FC<Props> = ({
                             {/* Tab 2 - Product Images */}
                             {tab === 1 && (
                                 <Grid container spacing={2}>
-                                    {(detailsData.images || []).map((img, i) => {
-                                        const imgSrc =
-                                            typeof img === "string"
-                                                ? `http://localhost:5000/uploads/${img}`
-                                                : `http://localhost:5000/uploads/${img.filename}`;
+                                    {(detailsData.images || []).map((img:any, i:any) => {
+                                        const imgSrc = img?.url;
 
                                         return (
                                             <Grid size={6}>

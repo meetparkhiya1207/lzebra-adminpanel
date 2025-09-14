@@ -79,7 +79,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
 
       // ✅ backend preview + new preview merge
       const newPreview = [
-        ...backendImages.map((img: any) => `${import.meta.env.VITE_BACKEND_URL}/uploads/${img.filename}`),
+        ...backendImages.map((img: any) => img?.url),
         ...newImages.map((file) => URL.createObjectURL(file))
       ]
 
