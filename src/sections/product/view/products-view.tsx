@@ -57,6 +57,7 @@ export function ProductsView() {
   const columns = [
     {
       name: "Image",
+      width: "120px",
       cell: (row: any) => (
         row.images && row.images.length > 0 ? (
           <img
@@ -83,12 +84,12 @@ export function ProductsView() {
       sortable: true,
       cell: (row: any) => (
         <Typography variant="caption" onClick={() => { setDetailsData(row); setProductDetailOpen(true) }
-        }>{row.productName}</Typography>
+        }>{row?.productName}</Typography>
       )
     },
     {
       name: "Category",
-      selector: (row: any) => row.category,
+      selector: (row: any) => row?.category,
       sortable: true,
 
     },
@@ -99,6 +100,7 @@ export function ProductsView() {
     },
     {
       name: "Price",
+      width: "80px",
       selector: (row: any) => `₹${row.price}`,
       sortable: true,
     },
@@ -106,9 +108,11 @@ export function ProductsView() {
       name: "Discount Price",
       selector: (row: any) => `₹${row.discountPrice}`,
       sortable: true,
+      width: "130px",
     },
     {
       name: "In Stock",
+      width: "100px",
       selector: (row: any) => row.inStock,
       sortable: true,
       cell: (row: any) => (
@@ -116,6 +120,7 @@ export function ProductsView() {
       ),
     },
     {
+      width: "120px",
       name: "Created",
       selector: (row: any) => new Date(row.createdAt).toLocaleDateString(),
       sortable: true,
@@ -145,7 +150,7 @@ export function ProductsView() {
             } catch (error) {
               console.error("Delete failed:", error);
             }
-          }}/>
+          }} />
 
 
         </>
@@ -323,18 +328,21 @@ export function ProductsView() {
           modalType={modalType}
         />
       ) : loading ? (
-        <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <CircularProgress />
+        </Box>
       ) : (
-        <Box sx={{ maxHeight: "100vh", overflowY: "auto" }}>
-          {/* 👆 scrollable table container */}
+        <Box sx={{ height: "70vh" }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 0 }}>
               <DataTable
                 columns={columns}
                 data={products || []}
                 pagination
                 highlightOnHover
                 striped
+                fixedHeader
+                fixedHeaderScrollHeight="65vh"
               />
             </CardContent>
           </Card>
@@ -382,9 +390,8 @@ export function ProductsView() {
             const row = openPopover?.dataset?.row ? JSON.parse(openPopover.dataset.row) : null;
 
             try {
-              const res = await deleteProduct(row.product_id); // 👈 backend ma product_id pass karo
-              if (res.success) {
-                // UI update: remove deleted product from state
+              const res = await deleteProduct(row.product_id);
+              if (res.success) {  
                 setProducts((prev: any) => prev.filter((p: any) => p?.product_id !== row.product_id));
               }
             } catch (error) {
