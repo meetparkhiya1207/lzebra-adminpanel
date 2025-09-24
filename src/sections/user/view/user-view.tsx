@@ -1,215 +1,173 @@
-import { useState, useCallback } from 'react';
+import { ToastContainer } from "react-toastify";
+import DataTable from "react-data-table-component";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
-import TableBody from '@mui/material/TableBody';
-import Typography from '@mui/material/Typography';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { Card, Select, Popover, MenuList, MenuItem, CardContent, OutlinedInput, menuItemClasses, CircularProgress } from "@mui/material";
 
-import { _users } from 'src/_mock';
-import { DashboardContent } from 'src/layouts/dashboard';
+import { getAllUsers } from "src/api/userApi";
+import { deleteProduct } from "src/api/productApi";
+import { DashboardContent } from "src/layouts/dashboard";
 
-import { Iconify } from 'src/components/iconify';
-import { Scrollbar } from 'src/components/scrollbar';
-
-import { TableNoData } from '../table-no-data';
-import { UserTableRow } from '../user-table-row';
-import { UserTableHead } from '../user-table-head';
-import { TableEmptyRows } from '../table-empty-rows';
-import { UserTableToolbar } from '../user-table-toolbar';
-import UserInsertUpdateModel from './userInsertUpdateModel';
-import { emptyRows, applyFilter, getComparator } from '../utils';
-
-import type { UserProps } from '../user-table-row';
-
-// ----------------------------------------------------------------------
+import { Label } from "src/components/label";
+import { Iconify } from "src/components/iconify";
 
 export function UserView() {
-  const table = useTable();
+  const [products, setProducts] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState<any>('');
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
-  const [filterName, setFilterName] = useState('');
-  const [userInsertUpdateModelOpen, setUserInsertUpdateModelOpen] = useState(false);
-  console.log('userInsertUpdateModelOpen', userInsertUpdateModelOpen)
-  const dataFiltered: UserProps[] = applyFilter({
-    inputData: _users,
-    comparator: getComparator(table.order, table.orderBy),
-    filterName,
-  });
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllUsers();
+        setAllUsers(data || []);
+        setProducts(data || []);
+      } catch (error) {
+        console.error("❌ Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const columns = [
+    {
+      name: "Name",
+      sortable: true,
+      cell: (row: any) => (
+        <Typography variant="caption" >{row?.customer_firstName + " " + row?.customer_lastName}</Typography>
+      )
+    },
+    {
+      name: "Email",
+      selector: (row: any) => row?.customer_email,
+    },
+    {
+      name: "Status",
+      selector: (row: any) => row.isActive,
+      cell: (row: any) => (
+        <Label color={(row.isActive === false && 'error') || 'success'}>{row.isActive == true ? "Active" : "Offline"}</Label>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    let filtered = [...allUsers];
+
+    if (search) {
+      filtered = filtered.filter(
+        (u) =>
+          (u.customer_firstName + " " + u.customer_lastName)
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          u.customer_email?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter((u) =>
+        statusFilter === "active" ? u.isActive === true : u.isActive === false
+      );
+    }
+
+    setProducts(filtered);
+  }, [search, statusFilter, allUsers]);
 
   return (
     <DashboardContent>
-      <Box
+      <ToastContainer />
+      <Card
         sx={{
-          mb: 5,
-          display: 'flex',
-          alignItems: 'center',
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          mb: 2,
+          bgcolor: "#fff",
+          pt: 1,
         }}
       >
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          {userInsertUpdateModelOpen ? "Add User" : "Users"}
-        </Typography>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={() => setUserInsertUpdateModelOpen(!userInsertUpdateModelOpen)}
-        >
-          New user
-        </Button>
-      </Box>
-      {
-        !userInsertUpdateModelOpen && (
-          <Card>
-            <UserTableToolbar
-              numSelected={table.selected.length}
-              filterName={filterName}
-              onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setFilterName(event.target.value);
-                table.onResetPage();
+        <CardContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "flex-start", sm: "center" },
+              gap: 2,
+            }}
+          >
+            {/* Left side title */}
+            <Typography
+              variant="h5"
+              sx={{
+                flexGrow: 1,
+                color: "#5A3A1B",
+                fontFamily: "'Poppins', sans-serif",
               }}
-            />
+            >
+              Users
+            </Typography>
 
-            <Scrollbar>
-              <TableContainer sx={{ overflow: 'unset' }}>
-                <Table sx={{ minWidth: 800 }}>
-                  <UserTableHead
-                    order={table.order}
-                    orderBy={table.orderBy}
-                    rowCount={_users.length}
-                    numSelected={table.selected.length}
-                    onSort={table.onSort}
-                    onSelectAllRows={(checked) =>
-                      table.onSelectAllRows(
-                        checked,
-                        _users.map((user) => user.id)
-                      )
-                    }
-                    headLabel={[
-                      { id: 'name', label: 'Name' },
-                      { id: 'company', label: 'Company' },
-                      { id: 'role', label: 'Role' },
-                      { id: 'isVerified', label: 'Verified', align: 'center' },
-                      { id: 'status', label: 'Status' },
-                      { id: '' },
-                    ]}
-                  />
-                  <TableBody>
-                    {dataFiltered
-                      .slice(
-                        table.page * table.rowsPerPage,
-                        table.page * table.rowsPerPage + table.rowsPerPage
-                      )
-                      .map((row) => (
-                        <UserTableRow
-                          key={row.id}
-                          row={row}
-                          selected={table.selected.includes(row.id)}
-                          onSelectRow={() => table.onSelectRow(row.id)}
-                        />
-                      ))}
+            {/* Right side actions (search + button) */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 1.5,
+                width: { xs: "100%", sm: "auto" },
+              }}
+            >
+              <OutlinedInput
+                placeholder="Search users..."
+                size="small"
+                sx={{
+                  width: { xs: "100%", sm: 300, md: 400 },
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Select
+                size="small"
+                displayEmpty
+                sx={{ width: { xs: "100%", sm: "180px" } }}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="">All Users</MenuItem>
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="offline">Offline</MenuItem>
+              </Select>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
-                    <TableEmptyRows
-                      height={68}
-                      emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
-                    />
-
-                    {notFound && <TableNoData searchQuery={filterName} />}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Scrollbar>
-
-            <TablePagination
-              component="div"
-              page={table.page}
-              count={_users.length}
-              rowsPerPage={table.rowsPerPage}
-              onPageChange={table.onChangePage}
-              rowsPerPageOptions={[5, 10, 25]}
-              onRowsPerPageChange={table.onChangeRowsPerPage}
-            />
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box sx={{ height: "70vh" }}>
+          <Card>
+            <CardContent sx={{ p: 0 }}>
+              <DataTable
+                columns={columns}
+                data={products || []}
+                pagination
+                highlightOnHover
+                striped
+                fixedHeader
+                fixedHeaderScrollHeight="65vh"
+              />
+            </CardContent>
           </Card>
-        )
-      }
-
-      {
-        userInsertUpdateModelOpen && (
-          <UserInsertUpdateModel />
-        )
-      }
+        </Box>
+      )}
     </DashboardContent>
   );
-}
-
-// ----------------------------------------------------------------------
-
-export function useTable() {
-  const [page, setPage] = useState(0);
-  const [orderBy, setOrderBy] = useState('name');
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-
-  const onSort = useCallback(
-    (id: string) => {
-      const isAsc = orderBy === id && order === 'asc';
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    },
-    [order, orderBy]
-  );
-
-  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
-    if (checked) {
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  }, []);
-
-  const onSelectRow = useCallback(
-    (inputValue: string) => {
-      const newSelected = selected.includes(inputValue)
-        ? selected.filter((value) => value !== inputValue)
-        : [...selected, inputValue];
-
-      setSelected(newSelected);
-    },
-    [selected]
-  );
-
-  const onResetPage = useCallback(() => {
-    setPage(0);
-  }, []);
-
-  const onChangePage = useCallback((event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const onChangeRowsPerPage = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      onResetPage();
-    },
-    [onResetPage]
-  );
-
-  return {
-    page,
-    order,
-    onSort,
-    orderBy,
-    selected,
-    rowsPerPage,
-    onSelectRow,
-    onResetPage,
-    onChangePage,
-    onSelectAllRows,
-    onChangeRowsPerPage,
-  };
 }

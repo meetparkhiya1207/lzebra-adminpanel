@@ -1,10 +1,10 @@
 import { ToastContainer } from "react-toastify";
 import DataTable from "react-data-table-component";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Button, Popover, MenuList, MenuItem, IconButton, menuItemClasses, CircularProgress, Card, CardHeader, CardContent, TextField, OutlinedInput, Select } from "@mui/material";
+import { Card, Button, Select, Popover, MenuList, MenuItem, CardContent, OutlinedInput, menuItemClasses, CircularProgress } from "@mui/material";
 
 import { DashboardContent } from "src/layouts/dashboard";
 import { getProducts, deleteProduct } from "src/api/productApi";

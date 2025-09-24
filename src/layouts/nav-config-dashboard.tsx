@@ -32,6 +32,11 @@ export const navData = [
     //   </Label>
     // ),
   },
+  {
+    title: 'Users',
+    path: '/user',
+    icon: icon('ic-user'),
+  },
   // {
   //   title: 'Blog',
   //   path: '/blog',
