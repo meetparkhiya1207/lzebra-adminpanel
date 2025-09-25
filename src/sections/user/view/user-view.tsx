@@ -1,17 +1,15 @@
+import { useState, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import DataTable from "react-data-table-component";
-import { useMemo, useState, useEffect, useCallback } from "react";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Card, Select, Popover, MenuList, MenuItem, CardContent, OutlinedInput, menuItemClasses, CircularProgress } from "@mui/material";
+import { Card, Select, MenuItem, CardContent, OutlinedInput, CircularProgress } from "@mui/material";
 
 import { getAllUsers } from "src/api/userApi";
-import { deleteProduct } from "src/api/productApi";
 import { DashboardContent } from "src/layouts/dashboard";
 
 import { Label } from "src/components/label";
-import { Iconify } from "src/components/iconify";
 
 export function UserView() {
   const [products, setProducts] = useState<any>([]);
@@ -103,11 +101,11 @@ export function UserView() {
           >
             {/* Left side title */}
             <Typography
-              variant="h5"
+              variant="h4"
               sx={{
                 flexGrow: 1,
                 color: "#5A3A1B",
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               }}
             >
               Users
@@ -127,7 +125,7 @@ export function UserView() {
                 size="small"
                 sx={{
                   width: { xs: "100%", sm: 300, md: 400 },
-                  fontFamily: "'Poppins', sans-serif",
+                  // fontFamily: "'Poppins', sans-serif",
                 }}
                 onChange={(e) => setSearch(e.target.value)}
               />

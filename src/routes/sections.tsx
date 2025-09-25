@@ -1,62 +1,89 @@
-import type { RouteObject } from 'react-router';
+import type { RouteObject } from "react-router";
 
-import { lazy, Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
-import { varAlpha } from 'minimal-shared/utils';
+import { lazy, Suspense } from "react";
+import { varAlpha } from "minimal-shared/utils";
+import { Outlet, Navigate } from "react-router-dom";
 
-import Box from '@mui/material/Box';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import Box from "@mui/material/Box";
+import LinearProgress, {
+  linearProgressClasses,
+} from "@mui/material/LinearProgress";
 
-import { AuthLayout } from 'src/layouts/auth';
-import { DashboardLayout } from 'src/layouts/dashboard';
+import { AuthLayout } from "src/layouts/auth";
+import { DashboardLayout } from "src/layouts/dashboard";
+// import { useAuth } from "src/context/AuthContext"; // 👈 create this file separately
 
 // ----------------------------------------------------------------------
+// Lazy loaded pages
+export const DashboardPage = lazy(() => import("src/pages/dashboard"));
+export const BlogPage = lazy(() => import("src/pages/blog"));
+export const UserPage = lazy(() => import("src/pages/user"));
+export const SignInPage = lazy(() => import("src/pages/sign-in"));
+export const SignUpPage = lazy(() => import("src/pages/sign-up"));
+export const ProductsPage = lazy(() => import("src/pages/products"));
+export const Page404 = lazy(() => import("src/pages/page-not-found"));
 
-export const DashboardPage = lazy(() => import('src/pages/dashboard'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
-export const UserPage = lazy(() => import('src/pages/user'));
-export const SignInPage = lazy(() => import('src/pages/sign-in'));
-export const ProductsPage = lazy(() => import('src/pages/products'));
-export const Page404 = lazy(() => import('src/pages/page-not-found'));
-
+// ----------------------------------------------------------------------
+// Fallback loader
 const renderFallback = () => (
   <Box
     sx={{
-      display: 'flex',
-      flex: '1 1 auto',
-      alignItems: 'center',
-      justifyContent: 'center',
+      display: "flex",
+      flex: "1 1 auto",
+      alignItems: "center",
+      justifyContent: "center",
     }}
   >
     <LinearProgress
       sx={{
         width: 1,
         maxWidth: 320,
-        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
-        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+        bgcolor: (theme) =>
+          varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+        [`& .${linearProgressClasses.bar}`]: { bgcolor: "text.primary" },
       }}
     />
   </Box>
 );
 
+// ----------------------------------------------------------------------
+// Protected Route wrapper
+function ProtectedRoute() {
+  const user = sessionStorage.getItem("user");
+  // const { user } = useAuth(); // 👈 from AuthContext
+
+  if (!user) {
+  return <Navigate to="/sign-in" replace />;
+  }
+
+  return <Outlet />;
+}
+
+// ----------------------------------------------------------------------
+// Routes
 export const routesSection: RouteObject[] = [
   {
-    element: (
-      <DashboardLayout>
-        <Suspense fallback={renderFallback()}>
-          <Outlet />
-        </Suspense>
-      </DashboardLayout>
-    ),
+    element: <ProtectedRoute />, // 👈 check authentication
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: 'user', element: <UserPage /> },
-      { path: 'products', element: <ProductsPage /> },
-      { path: 'blog', element: <BlogPage /> },
+      {
+        element: (
+          <DashboardLayout>
+            <Suspense fallback={renderFallback()}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        ),
+        children: [
+          { index: true, element: <DashboardPage /> },
+          { path: "user", element: <UserPage /> },
+          { path: "products", element: <ProductsPage /> },
+          { path: "blog", element: <BlogPage /> },
+        ],
+      },
     ],
   },
   {
-    path: 'sign-in',
+    path: "sign-in",
     element: (
       <AuthLayout>
         <SignInPage />
@@ -64,8 +91,16 @@ export const routesSection: RouteObject[] = [
     ),
   },
   {
-    path: '404',
+    path: "sign-up",
+    element: (
+      <AuthLayout>
+        <SignUpPage />
+      </AuthLayout>
+    ),
+  },
+  {
+    path: "404",
     element: <Page404 />,
   },
-  { path: '*', element: <Page404 /> },
+  { path: "*", element: <Page404 /> },
 ];

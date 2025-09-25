@@ -23,8 +23,6 @@ const ProductDetailsModel = ({
         setTab(0);
     };
 
-    console.log("detailsData", detailsData);
-
     return (
         <Modal open={productDetailOpen} onClose={handleClose}>
             <Box

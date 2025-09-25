@@ -251,11 +251,11 @@ export function ProductsView() {
           >
             {/* Left side title */}
             <Typography
-              variant="h5"
+              variant="h4"
               sx={{
                 flexGrow: 1,
                 color: "#5A3A1B",
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               }}
             >
               {userInsertUpdateModelOpen
@@ -266,6 +266,7 @@ export function ProductsView() {
             </Typography>
 
             {/* Right side actions (search + button) */}
+
             <Box
               sx={{
                 display: "flex",
@@ -274,29 +275,35 @@ export function ProductsView() {
                 width: { xs: "100%", sm: "auto" },
               }}
             >
-              <OutlinedInput
-                placeholder="Search products..."
-                size="small"
-                sx={{
-                  width: { xs: "100%", sm: 300, md: 400 },
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Select
-                size="small"
-                displayEmpty
-                sx={{ width: { xs: "100%", sm: "180px" } }}
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <MenuItem value="">All Categories</MenuItem>
-                {categories?.map((cat: any) => (
-                  <MenuItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </MenuItem>
-                ))}
-              </Select>
+              {
+                !userInsertUpdateModelOpen && (
+                  <>
+                    <OutlinedInput
+                      placeholder="Search products..."
+                      size="small"
+                      sx={{
+                        width: { xs: "100%", sm: 300, md: 400 },
+                        // fontFamily: "'Poppins', sans-serif",
+                      }}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <Select
+                      size="small"
+                      displayEmpty
+                      sx={{ width: { xs: "100%", sm: "180px" } }}
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      <MenuItem value="">All Categories</MenuItem>
+                      {categories?.map((cat: any) => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </>
+                )
+              }
               <Button
                 variant="contained"
                 startIcon={
@@ -310,7 +317,7 @@ export function ProductsView() {
                 sx={{
                   bgcolor: "#5A3A1B",
                   color: "#fff",
-                  fontFamily: "'Poppins', sans-serif",
+                  // fontFamily: "'Poppins', sans-serif",
                   width: { xs: "100%", sm: "auto" },
                 }}
               >
@@ -391,7 +398,7 @@ export function ProductsView() {
 
             try {
               const res = await deleteProduct(row.product_id);
-              if (res.success) {  
+              if (res.success) {
                 setProducts((prev: any) => prev.filter((p: any) => p?.product_id !== row.product_id));
               }
             } catch (error) {

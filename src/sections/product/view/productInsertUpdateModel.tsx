@@ -4,9 +4,9 @@ import { useForm, Controller } from 'react-hook-form'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
-  Box, Grid, Chip, Select, Button,
-  MenuItem, TextField, InputLabel, Typography, IconButton, FormControl,
-  Card,
+  Box, Grid, Chip, Card, Select,
+  Button, MenuItem, TextField, InputLabel, Typography, IconButton,
+  FormControl,
   CardContent
 } from '@mui/material'
 
@@ -61,7 +61,6 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       shirtMeter: modalType === 'Edit' && rowData ? rowData?.shirtMeter : "",
     }
   })
-  console.log("rowDatarowData", rowData);
 
   const selectedCategory = watch("category")
 
@@ -93,9 +92,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
 
   useEffect(() => {
     if (modalType === "Edit" && rowData?.images?.length > 0) {
-      setBackendImages(rowData.images) // DB ની images track કરવી
-      console.log("rowDatarowData", rowData);
-
+      setBackendImages(rowData.images)
       const backendPreview = rowData.images.map(
         (img: any) => img?.url
       )
@@ -151,7 +148,6 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       try {
         const payload = { id: rowData?.product_id, ...data }
         const res = await updateProduct(payload, images, deletedImages)
-        console.log("✅ Product Updated:", res);
         if (res?.success) {
           toast.success(res?.message);
           reset();
@@ -172,7 +168,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
       <CardContent sx={{ padding: { xs: 2, md: 3 } }}>
         <FormControl fullWidth component="form" onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={4}>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 name="productName"
                 control={control}
@@ -188,7 +184,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
                 )}
               />
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <FormControl fullWidth>
                 <InputLabel>Category</InputLabel>
                 <Controller
@@ -215,7 +211,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
           </Grid>
 
           <Grid container spacing={4} sx={{ marginTop: 4 }}>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <FormControl fullWidth disabled={!selectedCategory}>
                 <InputLabel>Sub Category</InputLabel>
                 <Controller
@@ -240,7 +236,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
                 )}
               </FormControl>
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <FormControl fullWidth>
                 <InputLabel>In Stock</InputLabel>
                 <Controller
@@ -258,7 +254,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
           </Grid>
 
           <Grid container spacing={4} sx={{ marginTop: 4 }}>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 name="price"
                 control={control}
@@ -274,7 +270,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
                 )}
               />
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 name="discountPrice"
                 control={control}
@@ -285,7 +281,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
             </Grid>
           </Grid>
           <Grid container spacing={4} sx={{ marginTop: 4 }}>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 name="paintMeter"
                 control={control}
@@ -295,7 +291,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 name="shirtMeter"
                 control={control}
@@ -306,7 +302,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
             </Grid>
           </Grid>
 
-          <Grid size={6} sx={{ marginTop: 4 }}>
+          <Grid size={{ md: 6, xs: 12 }} sx={{ marginTop: 4 }}>
             {/* <Typography variant="subtitle1" gutterBottom>
           Features
         </Typography> */}
@@ -363,7 +359,7 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
             />
           </Grid>
           <Grid container spacing={4} sx={{ marginTop: 4 }}>
-            <Grid size={6}>
+            <Grid size={{ md: 6, xs: 12 }}>
               <FormControl fullWidth>
                 <InputLabel>Tags</InputLabel>
                 <Controller
@@ -391,9 +387,9 @@ const ProductInsertUpdateModel = ({ setUserInsertUpdateModelOpen, rowData, modal
                 />
               </FormControl>
             </Grid>
-            <Grid size={6} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid size={{ md: 6, xs: 12 }} sx={{ display: "flex", alignItems: "center" }}>
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2, alignItems: "center" }}>
-                <Typography variant="subtitle1">Upload Images (Max 5)</Typography>
+                <Typography variant="subtitle1">Upload Images</Typography>
                 <Button variant="outlined" color="inherit" component="label">
                   Select Images
                   <input

@@ -1,6 +1,7 @@
 import type { CSSObject, Breakpoint } from '@mui/material/styles';
 
 import { merge } from 'es-toolkit';
+import { useLocation } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -40,7 +41,12 @@ export function AuthLayout({
   slotProps,
   layoutQuery = 'md',
 }: AuthLayoutProps) {
+  const location = useLocation();
+
+  const hideLogo =
+    location.pathname === "/sign-in" || location.pathname === "/sign-up";
   const renderHeader = () => {
+
     const headerSlotProps: HeaderSectionProps['slotProps'] = { container: { maxWidth: false } };
 
     const headerSlots: HeaderSectionProps['slots'] = {
@@ -52,7 +58,7 @@ export function AuthLayout({
       leftArea: (
         <>
           {/** @slot Logo */}
-          <Logo />
+          {!hideLogo && <Logo />}
         </>
       ),
       rightArea: (

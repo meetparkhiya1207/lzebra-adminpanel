@@ -22,7 +22,6 @@ export const createProduct = async (productData, images) => {
   formData.append("features", JSON.stringify(productData.features));
 
   images.forEach((file) => {
-    console.log("imagesimages", file);
     formData.append("images", file);
   });
 
