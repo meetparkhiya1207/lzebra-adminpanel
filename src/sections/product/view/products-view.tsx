@@ -270,6 +270,7 @@ export function ProductsView() {
                 flexDirection: { xs: "column", sm: "row" }, // 👈 column on mobile
                 alignItems: { xs: "stretch", sm: "center" }, // 👈 full width inputs on mobile
                 gap: 1.5,
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               {!userInsertUpdateModelOpen && (
