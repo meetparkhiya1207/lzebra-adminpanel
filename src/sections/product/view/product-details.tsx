@@ -10,7 +10,6 @@ import {
     Typography,
 } from "@mui/material";
 
-
 const ProductDetailsModel = ({
     productDetailOpen,
     setProductDetailOpen,
@@ -28,25 +27,35 @@ const ProductDetailsModel = ({
             <Box
                 sx={{
                     bgcolor: "#FAF6F0",
-                    p: 3,
+                    p: { xs: 2, sm: 3 },
                     borderRadius: 2,
-                    maxWidth: 800,
+                    width: { xs: "95%", sm: "90%", md: "80%", lg: "70%" }, // responsive width
                     mx: "auto",
-                    my: "5%",
+                    my: { xs: "10%", sm: "5%" },
                     display: "flex",
                     flexDirection: "column",
-                    maxHeight: "80vh", // full modal height limit
+                    maxHeight: "85vh", // limit height
                 }}
             >
                 {detailsData && (
                     <>
                         {/* Sticky Header */}
                         <Box sx={{ flexShrink: 0 }}>
-                            <Typography variant="h6" mb={2}>
+                            <Typography
+                                variant="h6"
+                                mb={2}
+                                sx={{ textAlign: { xs: "center", sm: "left" } }}
+                            >
                                 Product Details
                             </Typography>
 
-                            <Tabs value={tab} onChange={(e, v) => setTab(v)}>
+                            <Tabs
+                                value={tab}
+                                onChange={(e, v) => setTab(v)}
+                                variant="scrollable"
+                                scrollButtons
+                                allowScrollButtonsMobile
+                            >
                                 <Tab label="Details" />
                                 <Tab label="Images" />
                                 <Tab label="Features" />
@@ -59,30 +68,34 @@ const ProductDetailsModel = ({
                             sx={{
                                 flexGrow: 1,
                                 overflowY: "auto",
-                                pr: 1, // padding right for scrollbar space
+                                pr: 1,
                             }}
                         >
                             {/* Tab 1 - Product Details */}
                             {tab === 0 && (
                                 <Box>
                                     <Typography variant="body1" gutterBottom>
-                                        Name : {detailsData?.productName}
+                                        <b>Name:</b> {detailsData?.productName}
                                     </Typography>
-                                    <Divider sx={{ my: 2 }} />
+                                    <Divider sx={{ my: 1 }} />
+
                                     <Typography variant="body1" gutterBottom>
-                                        Category : {detailsData?.category}
+                                        <b>Category:</b> {detailsData?.category}
                                     </Typography>
-                                    <Divider sx={{ my: 2 }} />
+                                    <Divider sx={{ my: 1 }} />
+
                                     <Typography variant="body1" gutterBottom>
-                                        Sub Category : {detailsData?.subCategory}
+                                        <b>Sub Category:</b> {detailsData?.subCategory}
                                     </Typography>
-                                    <Divider sx={{ my: 2 }} />
-                                    <Typography variant="body1">
-                                        Price: ₹{detailsData?.price}
+                                    <Divider sx={{ my: 1 }} />
+
+                                    <Typography variant="body1" gutterBottom>
+                                        <b>Price:</b> ₹{detailsData?.price}
                                     </Typography>
-                                    <Divider sx={{ my: 2 }} />
-                                    <Typography variant="body1">
-                                        Discount Price: ₹{detailsData?.discountPrice}
+                                    <Divider sx={{ my: 1 }} />
+
+                                    <Typography variant="body1" gutterBottom>
+                                        <b>Discount Price:</b> ₹{detailsData?.discountPrice}
                                     </Typography>
                                 </Box>
                             )}
@@ -90,11 +103,11 @@ const ProductDetailsModel = ({
                             {/* Tab 2 - Product Images */}
                             {tab === 1 && (
                                 <Grid container spacing={2}>
-                                    {(detailsData.images || []).map((img:any, i:any) => {
+                                    {(detailsData.images || []).map((img: any, i: any) => {
                                         const imgSrc = img?.url;
 
                                         return (
-                                            <Grid size={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <Box
                                                     component="img"
                                                     src={imgSrc}
@@ -110,6 +123,8 @@ const ProductDetailsModel = ({
                                     })}
                                 </Grid>
                             )}
+
+                            {/* Tab 3 - Product Features */}
                             {tab === 2 && (
                                 <>
                                     {detailsData?.features?.map((val: string, index: number) => (
@@ -117,18 +132,16 @@ const ProductDetailsModel = ({
                                             <Typography variant="body1" gutterBottom>
                                                 • {val}
                                             </Typography>
-                                            <Divider sx={{ my: 2 }} />
+                                            <Divider sx={{ my: 1 }} />
                                         </Box>
                                     ))}
                                 </>
                             )}
-
                         </Box>
                     </>
                 )}
             </Box>
         </Modal>
-
     );
 };
 

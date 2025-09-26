@@ -43,8 +43,8 @@ export function ProductsView() {
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
-        setAllProducts(data || []); // store master list
-        setProducts(data || []);    // also initialize filtered list
+        setAllProducts(data || []);
+        setProducts(data || []);
       } catch (error) {
         console.error("❌ Error fetching products:", error);
       } finally {
@@ -80,7 +80,6 @@ export function ProductsView() {
     },
     {
       name: "Name",
-      // selector: (row: any) => row.productName,
       sortable: true,
       cell: (row: any) => (
         <Typography variant="caption" onClick={() => { setDetailsData(row); setProductDetailOpen(true) }
@@ -142,9 +141,8 @@ export function ProductsView() {
           <Iconify icon={"mdi:trash-can-outline" as any} sx={{ color: "red", mx: 1 }} width={22} height={22} onClick={async () => {
 
             try {
-              const res = await deleteProduct(row.product_id); // 👈 backend ma product_id pass karo
+              const res = await deleteProduct(row.product_id);
               if (res.success) {
-                // UI update: remove deleted product from state
                 setProducts((prev: any) => prev.filter((p: any) => p?.product_id !== row.product_id));
               }
             } catch (error) {
@@ -161,7 +159,7 @@ export function ProductsView() {
 
   // Search filter
   useEffect(() => {
-    let filtered = [...allProducts]; // 👈 use master list
+    let filtered = [...allProducts];
 
     if (search) {
       filtered = filtered.filter(
@@ -187,7 +185,7 @@ export function ProductsView() {
         id: cat,
         name: cat,
       })),
-    [products]
+    [allProducts]
   );
 
 
@@ -244,18 +242,16 @@ export function ProductsView() {
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" }, // 👈 mobile = column, tablet+ = row
-              alignItems: { xs: "flex-start", sm: "center" },
+              flexDirection: "column",
               gap: 2,
             }}
           >
-            {/* Left side title */}
+            {/* Title */}
             <Typography
-              variant="h4"
+              variant="h5"
               sx={{
-                flexGrow: 1,
                 color: "#5A3A1B",
-                // fontFamily: "'Poppins', sans-serif",
+                textAlign: { xs: "center", sm: "left" }, // 👈 center on mobile, left on larger screens
               }}
             >
               {userInsertUpdateModelOpen
@@ -265,50 +261,52 @@ export function ProductsView() {
                 : "Products"}
             </Typography>
 
-            {/* Right side actions (search + button) */}
-
+            {/* Actions */}
             <Box
               sx={{
                 display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
+                flexDirection: { xs: "column", sm: "row" }, // 👈 column on mobile
+                alignItems: { xs: "stretch", sm: "center" }, // 👈 full width inputs on mobile
                 gap: 1.5,
-                width: { xs: "100%", sm: "auto" },
               }}
             >
-              {
-                !userInsertUpdateModelOpen && (
-                  <>
-                    <OutlinedInput
-                      placeholder="Search products..."
-                      size="small"
-                      sx={{
-                        width: { xs: "100%", sm: 300, md: 400 },
-                        // fontFamily: "'Poppins', sans-serif",
-                      }}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                    <Select
-                      size="small"
-                      displayEmpty
-                      sx={{ width: { xs: "100%", sm: "180px" } }}
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      <MenuItem value="">All Categories</MenuItem>
-                      {categories?.map((cat: any) => (
-                        <MenuItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )
-              }
+              {!userInsertUpdateModelOpen && (
+                <>
+                  {/* Search */}
+                  <OutlinedInput
+                    placeholder="Search products..."
+                    size="small"
+                    sx={{
+                      flex: 1, // 👈 takes available space
+                      minWidth: { xs: "100%", sm: 230, md: 350 },
+                    }}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+
+                  {/* Category Select */}
+                  <Select
+                    size="small"
+                    displayEmpty
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    sx={{
+                      minWidth: { xs: "100%", sm: 150 },
+                    }}
+                  >
+                    <MenuItem value="">All Categories</MenuItem>
+                    {categories?.map((cat: any) => (
+                      <MenuItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </>
+              )}
+
+              {/* Button */}
               <Button
                 variant="contained"
-                startIcon={
-                  userInsertUpdateModelOpen ? "" : <Iconify icon="mingcute:add-line" />
-                }
+                startIcon={!userInsertUpdateModelOpen && <Iconify icon="mingcute:add-line" />}
                 onClick={() => {
                   setUserInsertUpdateModelOpen(!userInsertUpdateModelOpen);
                   setModalType("");
@@ -317,8 +315,7 @@ export function ProductsView() {
                 sx={{
                   bgcolor: "#5A3A1B",
                   color: "#fff",
-                  // fontFamily: "'Poppins', sans-serif",
-                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { xs: "100%", sm: "auto" }, // 👈 full width on mobile
                 }}
               >
                 {userInsertUpdateModelOpen ? "Back to Products" : "New Product"}
@@ -327,6 +324,7 @@ export function ProductsView() {
           </Box>
         </CardContent>
       </Card>
+
 
       {userInsertUpdateModelOpen ? (
         <ProductInsertUpdateModel
