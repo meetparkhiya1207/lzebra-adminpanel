@@ -11,6 +11,7 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { useRouter } from "src/routes/hooks";
 
@@ -28,10 +29,7 @@ export function SignUpView() {
 
     mobile: Yup.string()
       .required("Mobile number is required")
-      .matches(
-        /^[0-9]{10}$/,
-        "Mobile number must be exactly 10 digits"
-      ),
+      .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
 
     email: Yup.string()
       .required("Email address is required")
@@ -40,10 +38,6 @@ export function SignUpView() {
     password: Yup.string()
       .required("Password is required")
       .min(3, "Password must be at least 3 characters long"),
-    // .matches(
-    //   /^(?=.*[A-Z])(?=.*\d)/,
-    //   "Password must contain at least one uppercase letter and one number"
-    // ),
 
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), ""], "Passwords must match")
@@ -56,24 +50,27 @@ export function SignUpView() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = useCallback(async (data: any) => {
     try {
+      setLoading(true);
       const res = await createClient(data);
       if (res?.success) {
         toast.success(res?.message);
         setTimeout(() => {
-          router.push('/sign-in');
+          router.push("/sign-in");
         }, 2000);
       } else {
         toast.error(res?.message || "Sign up failed");
-
       }
     } catch (error) {
       console.error("❌ Create Client Error:", error);
-      throw error;
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   return (
     <>
@@ -89,9 +86,11 @@ export function SignUpView() {
 
       {/* Form Header */}
       <Box sx={{ gap: 1.5, display: "flex", flexDirection: "column", alignItems: "center", mb: 5 }}>
-        {/* <Typography variant="h5">Register</Typography> */}
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Already have an account? <Link variant="subtitle2" sx={{ ml: 0.5 }}>Sign in</Link>
+          Already have an account?{" "}
+          <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={() => router.push("/sign-in")}>
+            Sign in
+          </Link>
         </Typography>
       </Box>
 
@@ -162,8 +161,16 @@ export function SignUpView() {
           }}
         />
 
-        <Button fullWidth size="large" type="submit" variant="contained" color="inherit">
-          Register
+        <Button
+          fullWidth
+          size="large"
+          type="submit"
+          variant="contained"
+          color="inherit"
+          disabled={loading}
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+        >
+          {loading ? "Registering..." : "Register"}
         </Button>
       </Box>
     </>
