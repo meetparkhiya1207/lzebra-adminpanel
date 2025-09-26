@@ -1,8 +1,8 @@
-import { SvgColor } from 'src/components/svg-color';
+import { Label } from 'src/components/label';
 
 // ----------------------------------------------------------------------
 
-const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} />;
+const icon = (name: string) => <img src={`/assets/icons/navbar/${name}.png`} style={{ width: 24, height: 24 }} />;
 
 export type NavItem = {
   title: string;
@@ -15,7 +15,7 @@ export const navData = [
   {
     title: 'Dashboard',
     path: '/',
-    icon: icon('ic-analytics'),
+    icon: icon('dashboard'),
   },
   // {
   //   title: 'User',
@@ -25,17 +25,22 @@ export const navData = [
   {
     title: 'Product',
     path: '/products',
-    icon: icon('ic-cart'),
-    // info: (
-    //   <Label color="error" variant="inverted">
-    //     +3
-    //   </Label>
-    // ),
+    icon: icon('add-product'),
+    info: (
+        <Label color="error" variant="inverted">
+          +3
+        </Label>
+    ),
   },
   {
     title: 'Users',
     path: '/user',
-    icon: icon('ic-user'),
+    icon: icon('group'),
+  },
+  {
+    title: 'Orders',
+    path: '/orders',
+    icon: icon('orders'),
   },
   // {
   //   title: 'Blog',

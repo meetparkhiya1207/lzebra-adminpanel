@@ -20,6 +20,7 @@ export const BlogPage = lazy(() => import("src/pages/blog"));
 export const UserPage = lazy(() => import("src/pages/user"));
 export const SignInPage = lazy(() => import("src/pages/sign-in"));
 export const SignUpPage = lazy(() => import("src/pages/sign-up"));
+export const OrdersPage = lazy(() => import("src/pages/orders"));
 export const ProductsPage = lazy(() => import("src/pages/products"));
 export const Page404 = lazy(() => import("src/pages/page-not-found"));
 
@@ -78,6 +79,7 @@ export const routesSection: RouteObject[] = [
           { path: "user", element: <UserPage /> },
           { path: "products", element: <ProductsPage /> },
           { path: "blog", element: <BlogPage /> },
+          { path: "orders", element: <OrdersPage /> },
         ],
       },
     ],

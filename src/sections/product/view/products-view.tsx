@@ -242,13 +242,15 @@ export function ProductsView() {
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "flex-start", sm: "center" },
+              justifyContent: "space-between",
               gap: 2,
             }}
           >
             {/* Title */}
             <Typography
-              variant="h5"
+              variant="h4"
               sx={{
                 color: "#5A3A1B",
                 textAlign: { xs: "center", sm: "left" }, // 👈 center on mobile, left on larger screens

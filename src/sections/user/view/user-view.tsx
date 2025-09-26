@@ -96,6 +96,7 @@ export function UserView() {
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
               alignItems: { xs: "flex-start", sm: "center" },
+              justifyContent: "space-between",
               gap: 2,
             }}
           >
